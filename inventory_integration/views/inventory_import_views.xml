@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_inventory_import_tree" model="ir.ui.view">
+        <field name="name">inventory.import.tree</field>
+        <field name="model">inventory.import</field>
+        <field name="arch" type="xml">
+            <tree string="Imported Inventories" decoration-muted="state=='draft'" 
+                  decoration-danger="state=='error'" decoration-success="state=='imported'">
+                <field name="name"/>
+                <field name="total_items"/>
+                <field name="field_count"/>
+                <field name="import_date"/>
+                <field name="state" widget="badge" 
+                       decoration-muted="state=='draft'"
+                       decoration-danger="state=='error'"
+                       decoration-success="state=='imported'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_inventory_import_form" model="ir.ui.view">
+        <field name="name">inventory.import.form</field>
+        <field name="model">inventory.import</field>
+        <field name="arch" type="xml">
+            <form string="Inventory Details">
+                <header>
+                    <button name="action_refresh_data" string="Refresh Data" 
+                            type="object" class="oe_highlight" 
+                            invisible="state != 'imported'"/>
+                    <field name="state" widget="statusbar" 
+                           statusbar_visible="draft,imported"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(action_inventory_field_list)d" 
+                                type="action" 
+                                class="oe_stat_button" 
+                                icon="fa-list">
+                            <field name="field_count" widget="statinfo" string="Fields"/>
+                        </button>
+                    </div>
+                    
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Inventory Name"/>
+                        </h1>
+                    </div>
+                    
+                    <group>
+                        <group>
+                            <field name="inventory_id" readonly="1"/>
+                            <field name="total_items" readonly="1"/>
+                            <field name="import_date" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="api_token" password="True" readonly="1"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Description">
+                            <field name="description" placeholder="No description available..."/>
+                        </page>
+                        
+                        <page string="Field Aggregations">
+                            <field name="field_ids" mode="tree,form">
+                                <tree string="Fields" create="false" delete="false">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="field_name"/>
+                                    <field name="field_type" widget="badge"/>
+                                    <field name="aggregation_summary"/>
+                                </tree>
+                            </field>
+                        </page>
+                        
+                        <page string="Error Log" invisible="not error_message">
+                            <field name="error_message" readonly="1" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_inventory_import_search" model="ir.ui.view">
+        <field name="name">inventory.import.search</field>
+        <field name="model">inventory.import</field>
+        <field name="arch" type="xml">
+            <search string="Search Inventories">
+                <field name="name" string="Name"/>
+                <field name="inventory_id"/>
+                <filter string="Imported" name="filter_imported" domain="[('state', '=', 'imported')]"/>
+                <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Error" name="filter_error" domain="[('state', '=', 'error')]"/>
+                <separator/>
+                <filter string="Recently Imported" name="filter_recent" domain="[]" 
+                        context="{'order': 'import_date desc'}"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                    <filter string="Import Date" name="group_date" context="{'group_by': 'import_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_inventory_import" model="ir.actions.act_window">
+        <field name="name">Imported Inventories</field>
+        <field name="res_model">inventory.import</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_filter_imported': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No inventories imported yet
+            </p>
+            <p>
+                Click on "Import from API" to import your first inventory.
+            </p>
+        </field>
+    </record>
+</odoo>

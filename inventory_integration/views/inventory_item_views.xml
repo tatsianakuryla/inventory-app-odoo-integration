@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_inventory_item_tree" model="ir.ui.view">
+        <field name="name">inventory.item.tree</field>
+        <field name="model">inventory.item</field>
+        <field name="arch" type="xml">
+            <tree string="Inventory Items" decoration-muted="state=='draft'"
+                  decoration-danger="state=='error'" decoration-success="state=='exported'">
+                <field name="name"/>
+                <field name="inventory_import_id"/>
+                <field name="export_date"/>
+                <field name="state" widget="badge"
+                       decoration-muted="state=='draft'"
+                       decoration-danger="state=='error'"
+                       decoration-success="state=='exported'"/>
+                <button name="action_export_to_api" string="Export to API"
+                        type="object" icon="fa-cloud-upload"
+                        invisible="state != 'draft'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_inventory_item_form" model="ir.ui.view">
+        <field name="name">inventory.item.form</field>
+        <field name="model">inventory.item</field>
+        <field name="arch" type="xml">
+            <form string="Inventory Item">
+                <header>
+                    <button name="action_export_to_api" string="Export to API"
+                            type="object" class="oe_highlight"
+                            invisible="state != 'draft'"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft"
+                            type="object"
+                            invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,exported"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Item Name"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="inventory_import_id"
+                                   options="{'no_create': True}"/>
+                            <field name="export_date" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Field Values">
+                            <field name="field_values" widget="ace"
+                                   options="{'mode': 'json'}"
+                                   placeholder="{}"
+                                   readonly="state == 'exported'"/>
+                            <div class="alert alert-info mt-3">
+                                <strong>Tip:</strong> Edit field values as JSON.
+                                Check the inventory's field structure for available fields.
+                            </div>
+                        </page>
+
+                        <page string="Error Log" invisible="not error_message">
+                            <field name="error_message" readonly="1" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_inventory_item_search" model="ir.ui.view">
+        <field name="name">inventory.item.search</field>
+        <field name="model">inventory.item</field>
+        <field name="arch" type="xml">
+            <search string="Search Items">
+                <field name="name" string="Name"/>
+                <field name="inventory_import_id"/>
+                <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Exported" name="filter_exported" domain="[('state', '=', 'exported')]"/>
+                <filter string="Error" name="filter_error" domain="[('state', '=', 'error')]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Inventory" name="group_inventory" context="{'group_by': 'inventory_import_id'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_inventory_item" model="ir.actions.act_window">
+        <field name="name">Inventory Items</field>
+        <field name="res_model">inventory.item</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No items created yet
+            </p>
+            <p>
+                Create items in Odoo and export them to your backend inventory.
+            </p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_inventory_integration_root"
+              name="Inventory Integration"
+              sequence="100"/>
+
+    <menuitem id="menu_inventory_integration_inventories"
+              name="Inventories"
+              parent="menu_inventory_integration_root"
+              sequence="10"/>
+
+    <menuitem id="menu_inventory_import"
+              name="Imported Inventories"
+              parent="menu_inventory_integration_inventories"
+              action="action_inventory_import"
+              sequence="10"/>
+
+    <menuitem id="menu_inventory_import_wizard"
+              name="Import from API"
+              parent="menu_inventory_integration_inventories"
+              action="action_inventory_import_wizard"
+              sequence="20"/>
+
+    <menuitem id="menu_inventory_integration_config"
+              name="Configuration"
+              parent="menu_inventory_integration_root"
+              sequence="90"
+              groups="base.group_system"/>
+</odoo>
