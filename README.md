@@ -26,8 +26,11 @@ pip install requests
 
 ### Install the Module
 
+#### Option 1: Manual Installation
+
 1. **Copy module to Odoo addons directory:**
    ```bash
+   # From the odoo_module directory
    cp -r inventory_integration /path/to/odoo/addons/
    ```
 
@@ -40,16 +43,27 @@ pip install requests
    - Search for "Inventory Integration"
    - Click "Install"
 
+#### Option 2: Docker Deployment
+
+```bash
+# From the odoo_module directory
+docker-compose up -d
+```
+
+Odoo will be available at `http://localhost:8069`
+- Default login: `admin`
+- Default password: `admin`
+
 ## Configuration
 
 ### 1. Configure API Base URL
 
-By default, the module uses `http://localhost:3000` as the API base URL.
+By default, the module uses `https://site--inventory-app-server--sm9fnltkyqvh.code.run` as the API base URL (production).
 
-To change it:
+For local development, change it to `http://localhost:3000`:
 - Open the import wizard
 - Modify the "API Base URL" field
-- Or set a default in the wizard model
+- Or update the default in `wizard/import_wizard.py`
 
 ### 2. Obtain API Token
 
@@ -65,7 +79,7 @@ From your inventory application:
 1. **Navigate to**: Inventory Integration → Import from API
 2. **Enter**:
    - API Token (from your inventory system)
-   - API Base URL (default: http://localhost:3000)
+   - API Base URL (default: production URL, change if needed)
    - (Optional) Select existing inventory to update
 3. **Click**: "Import"
 4. **Result**: View imported inventory with aggregated statistics
@@ -152,6 +166,7 @@ inventory_integration/
 ├── views/
 │   ├── inventory_import_views.xml
 │   ├── inventory_field_views.xml
+│   ├── inventory_item_views.xml
 │   └── menu_views.xml
 ├── security/
 │   └── ir.model.access.csv
@@ -181,82 +196,3 @@ Field aggregation data:
 - Number fields: min, max, average, count
 - Text fields: unique_count, total_count, top_values
 - Boolean fields: true_count, false_count, null_count
-
-## Troubleshooting
-
-### Connection Errors
-
-**Problem**: Cannot connect to API
-
-**Solutions**:
-- Verify API base URL is correct
-- Check if backend server is running
-- Ensure firewall allows connection
-- Check Odoo server logs for detailed error
-
-### Invalid Token
-
-**Problem**: "Invalid API token" error
-
-**Solutions**:
-- Generate new token from inventory system
-- Verify token is copied completely
-- Check token hasn't expired
-
-### Import Fails
-
-**Problem**: Import fails with error
-
-**Solutions**:
-- Check error message in form
-- Verify API response format matches specification
-- Check Odoo server logs: `odoo-bin --log-level=debug`
-
-## Development
-
-### Enable Developer Mode
-
-1. Settings → Activate Developer Mode
-2. Access technical menus and debug info
-
-### View Logs
-
-```bash
-tail -f /var/log/odoo/odoo-server.log
-```
-
-### Debug Import
-
-Add logging in `import_wizard.py`:
-```python
-import logging
-_logger = logging.getLogger(__name__)
-_logger.info('Debug message here')
-```
-
-## Security
-
-- API tokens stored encrypted in database
-- User access controlled via Odoo security groups
-- Read-only access for public users
-- Full CRUD for authenticated users
-
-## License
-
-LGPL-3
-
-## Support
-
-For issues or questions:
-- Check Odoo logs
-- Verify API endpoint accessibility
-- Review module documentation
-
-## Changelog
-
-### Version 1.0.0
-- Initial release
-- API token-based import
-- Field aggregation display
-- Refresh functionality
-- Multi-field type support

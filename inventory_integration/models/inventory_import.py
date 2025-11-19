@@ -76,6 +76,8 @@ class InventoryImport(models.Model):
         for record in self:
             record.field_count = len(record.field_ids)
 
+    # Refresh inventory data from API (triggered by "Refresh Data" button)
+    # Creates wizard with saved token and triggers import
     def action_refresh_data(self):
         self.ensure_one()
         wizard = self.env['inventory.import.wizard'].create({

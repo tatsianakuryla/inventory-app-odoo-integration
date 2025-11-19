@@ -49,6 +49,8 @@ class InventoryImportWizard(models.TransientModel):
             if record.api_token and len(record.api_token) < 10:
                 raise ValidationError(_('API Token seems invalid. Please check and try again.'))
 
+    # Main import workflow: fetch data from API, create/update inventory, parse aggregations
+    # Returns action to open imported inventory form
     def action_import(self):
         self.ensure_one()
         
@@ -93,6 +95,8 @@ class InventoryImportWizard(models.TransientModel):
                 })
             raise UserError(_(error_msg))
 
+    # Fetch inventory data from backend API using token
+    # Makes GET request to /api/inventory/odoo/data?token=xxx
     def _fetch_inventory_data(self):
         url = f"{self.api_base_url}/api/inventory/odoo/data"
         params = {'token': self.api_token}
@@ -119,6 +123,8 @@ class InventoryImportWizard(models.TransientModel):
         except requests.Timeout:
             raise UserError(_('API request timed out. Please try again.'))
 
+    # Create new inventory or update existing one with API data
+    # Deletes old field aggregations if updating
     def _create_or_update_inventory(self, data):
         vals = {
             'name': data.get('inventoryName', 'Unnamed Inventory'),
@@ -138,6 +144,8 @@ class InventoryImportWizard(models.TransientModel):
         else:
             return self.env['inventory.import'].create(vals)
 
+    # Create inventory.field records for each field with aggregations
+    # Calls parse_aggregation_data() for each field
     def _create_field_aggregations(self, inventory, fields_data):
         InventoryField = self.env['inventory.field']
         

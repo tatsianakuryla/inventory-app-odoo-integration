@@ -91,6 +91,8 @@ class InventoryField(models.Model):
         store=False
     )
 
+    # Compute human-readable summary of aggregations for UI display
+    # Different format for each field type (number/text/boolean)
     @api.depends('field_type', 'number_min', 'number_max', 'number_average',
                  'text_unique_count', 'boolean_true_count', 'boolean_false_count')
     def _compute_aggregation_summary(self):
@@ -116,6 +118,8 @@ class InventoryField(models.Model):
             else:
                 record.aggregation_summary = 'N/A'
 
+    # Parse aggregation JSON from API and populate corresponding fields
+    # Handles number stats (min/max/avg), text stats (unique/top values), boolean counts
     def parse_aggregation_data(self, aggregation_dict):
         self.aggregation_json = json.dumps(aggregation_dict, indent=2)
 
